@@ -52,6 +52,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'RequireTest';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+#$route['yui_combo'] = "YUI/index";
+$route['yui_combo/(:any)/(:any)/(:any)'] = "YUI/get/$1/$2/$3";
+#$route['yui_combo/(:any)/(:num)/(:any)/(:any)'] = "YUI/get/$1/$2/$3/$4";
+$route['yui_combo/(:any)/(:num)/(:any)/(:any)/(:any)'] = "YUI/get5/$1/$2/$3/$4/$5";
+http://localhost/ci3Moodle29/yui_combo/m/1682930036/core/blocks/blocks-debug.js
+$route['Javascript/(:num)/(:any)/(:any)'] = "Javascript/get/$1/$2/$3";
+$route['Javascript/(:num)/(:any)/(:any)/(:any)'] = "Javascript/get4/$1/$2/$3/$4";
+$route['Requirejs/(:any)/(:any)/(:any)'] = "RequireJS/get/$1/$2/$3";
+
 // SmartyaACL route
 $route['importdatabase'] = 'welcome/importdatabase';
 $route['admin'] = 'Admin/index';

@@ -85,3 +85,35 @@ defined('EXIT__AUTO_MIN')      OR define('EXIT__AUTO_MIN', 9); // lowest automat
 defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
 defined('CACHE_DISABLE_ALL')   OR define('CACHE_DISABLE_ALL', true);
+
+define('PARAM_RAW', 'raw');
+define('PARAM_RAW_TRIMMED', 'raw_trimmed');
+define('PARAM_CLEAN',    'clean');
+define('PARAM_CLEANHTML', 'cleanhtml');
+define('PARAM_INT',      'int');
+define('PARAM_FLOAT',  'float');
+define('PARAM_ALPHA',    'alpha');
+define('PARAM_ALPHAEXT', 'alphaext');
+define('PARAM_ALPHANUM', 'alphanum');
+define('PARAM_ALPHANUMEXT', 'alphanumext');
+define('PARAM_SEQUENCE',  'sequence');
+define('PARAM_BOOL',     'bool');
+define('PARAM_NOTAGS',   'notags');
+define('PARAM_TEXT',  'text');
+define('PARAM_COMPONENT', 'component');
+define('PARAM_PLUGIN', 'plugin');
+define('PARAM_AREA', 'area');
+define('PARAM_SAFEDIR',  'safedir');
+define('PARAM_SAFEPATH',  'safepath');
+define('PARAM_FILE',   'file');
+define('PARAM_PATH',     'path');
+define('PARAM_HOST',     'host');
+define('PARAM_URL',      'url');
+define('PARAM_LOCALURL', 'localurl');
+define('PARAM_PEM',      'pem');
+define('PARAM_BASE64',   'base64');
+define('PARAM_TAG',   'tag');
+define('PARAM_TAGLIST',   'taglist');
+define('PARAM_CAPABILITY',   'capability');
+define('PARAM_PERMISSION',   'permission');
+define('PARAM_AUTH',  'auth');

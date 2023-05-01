@@ -24,3 +24,7 @@ debugBreak();
         $CFG->{$name} = $value;
     }
 }
+
+function print_error($errorcode, $module = 'error', $link = '', $a = null, $debuginfo = null) {
+    throw new exception($errorcode, $module, $a, $debuginfo);
+}

@@ -1,3 +1,6 @@
+	<? if (!empty($standard_footer_html)) : ?>
+		<?= $standard_footer_html; ?>
+	<? endif; ?>
 </div>
 <? /* 
 	// Analytics - uncomment and put in our #
@@ -10,3 +13,4 @@
 */ ?>
 
 </body>
+</html>

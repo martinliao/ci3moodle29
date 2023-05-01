@@ -17,7 +17,7 @@
  * @param string $etag
  * @param string $filename
  */
-function js_send_cached($jspath, $etag, $filename = 'javascript.php')
+function js_send_cached($jspath, $etag, $filename = 'Javascript') // javascript.php
 {
     require(__DIR__ . '/xsendfilelib.php');
 
@@ -49,7 +49,7 @@ function js_send_cached($jspath, $etag, $filename = 'javascript.php')
  * @param string $js
  * @param string $filename
  */
-function js_send_uncached($js, $filename = 'javascript.php')
+function js_send_uncached($js, $filename = 'Javascript') //javascript.php
 {
     header('Content-Disposition: inline; filename="' . $filename . '"');
     header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
@@ -95,7 +95,7 @@ function js_write_cache_file_content($file, $content)
     if (!file_exists(dirname($file))) {
         @mkdir(dirname($file), $CFG->directorypermissions, true);
     }
-
+debugBreak();
     // Prevent serving of incomplete file from concurrent request,
     // the rename() should be more atomic than fwrite().
     ignore_user_abort(true);

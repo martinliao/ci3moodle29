@@ -4,19 +4,22 @@
  * This controller contains the general home site pages.
  *
  */
-class Javascript extends JavascriptController
+class Javascript extends MY_Controller //JavascriptController
 {
 
 	protected $data = array();
 
 	public function __construct()
 	{
+		global $CFG;
+        define('MOODLE_INTERNAL', true);
+		$CFG->dirroot = FCPATH;
 		parent::__construct();
 		//$filterQueryString = filterQueryString($_SERVER['QUERY_STRING']);
 		//$slashargument = min_get_slash_argument();
-		#$this->load->helper('configonlylib');
-		#$this->load->helper('jslib');
-		#$this->load->library(['core/minify']);
+		$this->load->helper('configonlylib');
+		$this->load->helper('jslib');
+		$this->load->library(['core/minify']);
 	}
 
 
@@ -31,7 +34,16 @@ class Javascript extends JavascriptController
 		$this->load->view('/general/index', $data);
 	}
 
-	public function get($id = null, $path, $scriptfile) {
+
+	public function get4($id = null, $path, $path2, $scriptfile)
+	{
+		return $this->get($id, "{$path}/{$path2}", $scriptfile);
+	}
+
+	public function get($id = null, $path, $scriptfile) 
+	{
+		global $CFG;
+//debugBreak();
 		$uri = current_url(true);
 		# $path = $this->request->getPath(); # not working
 		#$product_id = $this->uri->segment(3, 0);
@@ -54,9 +66,9 @@ class Javascript extends JavascriptController
 		$jsfiles = array();
 		$files = explode(',', $file);
 		foreach ($files as $fsfile) {
-			$tmp= APPPATH.$fsfile;
+			$tmp= $CFG->dirroot.$fsfile;
 			//$jsfile = realpath(ASSETSPATH.$fsfile);
-			$jsfile = realpath(APPPATH.$fsfile);
+			$jsfile = realpath($CFG->dirroot.$fsfile);
 			if ($jsfile === false) {
 				// does not exist
 				continue;

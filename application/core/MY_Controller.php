@@ -44,7 +44,7 @@ class MY_Controller extends MX_Controller
 
         // This function returns the main CodeIgniter object.
         // Normally, to call any of the available CodeIgniter object or pre defined library classes then you need to declare.
-        $CI =& get_instance();
+        $this->CI =& get_instance();
 
         // Load global css here.
 		$this->load_css(array(

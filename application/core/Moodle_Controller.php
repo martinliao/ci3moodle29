@@ -29,7 +29,14 @@ class MoodleController extends MY_Controller
 
     protected $M_cfg;
 
+    protected $amdjscode = array('');
+
     protected $jsinitcode = array();
+
+    /**
+     * @var array List of requested event handlers
+     */
+    protected $eventhandlers = array();
 
     /**
      * @var array Extra modules
@@ -60,6 +67,8 @@ class MoodleController extends MY_Controller
         global $CFG;
         define('MOODLE_INTERNAL', true);
 
+        $CFG->yui2version = '2.9.0';
+        $CFG->yui3version = '3.17.2';
         $CFG->dirroot = dirname(dirname(dirname(__FILE__)));
         $CFG->libdir = $CFG->dirroot .'/lib';
 //debugBreak();
@@ -71,6 +80,7 @@ class MoodleController extends MY_Controller
         $_cfg = $this->moodle_model->initialise_cfg('core');
 
         $this->load->helper('setuplib');
+        $this->load->helper('moodlelib');
         $sep = '/'; // $sep = empty($CFG->yuislasharguments) ? '?' : '/';
 
         $this->yui3loader = new stdClass();
@@ -82,7 +92,7 @@ class MoodleController extends MY_Controller
         // $this->load->config('yui'), $this->config->item('
         // Set up some loader options.
         $this->yui3loader->local_base = base_url('/lib/yuilib/') . $CFG->yui3version . '/';
-        $this->yui3loader->local_comboBase = base_url('/theme/yui_combo.php') . $sep;
+        $this->yui3loader->local_comboBase = base_url('/yui_combo') . $sep; // '/theme/yui_combo.php'
         $this->yui3loader->base = $this->yui3loader->local_base;
         $this->yui3loader->comboBase = $this->yui3loader->local_comboBase;
         // Enable combo loader? This significantly helps with caching and performance!
@@ -99,7 +109,7 @@ class MoodleController extends MY_Controller
         $this->YUI_config->add_group('yui2', array(
             // Loader configuration for our 2in3, for now ignores $CFG->useexternalyui.
             'base' => base_url('/lib/yuilib/2in3/') . $yui2version . '/build/',
-            'comboBase' => base_url('/theme/yui_combo.php') . $sep,
+            'comboBase' => base_url('/yui_combo') . $sep, // /theme/yui_combo.php
             'combine' => $this->yui3loader->combine,
             'ext' => false,
             'root' => '2in3/' . $yui2version .'/build/',
@@ -114,9 +124,9 @@ class MoodleController extends MY_Controller
         $configname = $this->YUI_config->set_config_source('lib/yui/config/moodle.js');
         $this->YUI_config->add_group('moodle', array(
             'name' => 'moodle',
-            'base' => base_url('/theme/yui_combo.php') . $sep . 'm/' . $jsrev . '/',
+            'base' => base_url('/yui_combo') . $sep . 'm/' . $jsrev . '/', // /theme/yui_combo.php
             'combine' => $this->yui3loader->combine,
-            'comboBase' => base_url('/theme/yui_combo.php') . $sep,
+            'comboBase' => base_url('/yui_combo') . $sep,
             'ext' => false,
             'root' => 'm/'.$jsrev.'/', // Add the rev to the root path so that we can control caching.
             'patterns' => array(
@@ -131,7 +141,7 @@ class MoodleController extends MY_Controller
             'name' => 'gallery',
             'base' => base_url('/lib/yuilib/gallery/'),
             'combine' => $this->yui3loader->combine,
-            'comboBase' => base_url('/theme/yui_combo.php') . $sep,
+            'comboBase' => base_url('/yui_combo') . $sep, // theme/yui_combo.php
             'ext' => false,
             'root' => 'gallery/' . $jsrev . '/',
             'patterns' => array(
@@ -156,7 +166,7 @@ class MoodleController extends MY_Controller
         // end of outputrequirementslib::__construct()
 
 //debugBreak();
-        $this->load->library('theme');
+        //$this->load->library('theme');
 
         // Example data
         // Site name
@@ -217,7 +227,8 @@ class MoodleController extends MY_Controller
     function init_requirements_data() {
         // Init the js config.
         $this->get_config_for_javascript();
-        $this->yui_module('moodle-core-blocks', 'M.core_blocks.init_dragdrop', [], null, true);
+        // ToDo: core-block
+        //$this->yui_module('moodle-core-blocks', 'M.core_blocks.init_dragdrop', [], null, true);
     }
 
     /**
@@ -245,7 +256,7 @@ class MoodleController extends MY_Controller
         $code = '';
 
         $jsrev = $this->get_jsrev();
-        //debugBreak();
+//debugBreak();
         $yuiformat = '-min';
         if ($this->yui3loader->filter === 'RAW') {
             $yuiformat = '';
@@ -275,8 +286,11 @@ class MoodleController extends MY_Controller
                 $code .= '<link rel="stylesheet" type="text/css" href="'.$this->yui3loader->comboBase.implode('&amp;', $modules).'" />';
             }
             $code .= '<link rel="stylesheet" type="text/css" href="'.$this->yui3loader->local_comboBase.'rollup/'.$CFG->yui3version.'/yui-moodlesimple' . $yuiformat . '.css" />';
-            $code .= '<script type="text/javascript" src="'.$this->yui3loader->local_comboBase
-                    . implode('&amp;', $baserollups) . '"></script>';
+            //$code .= '<script type="text/javascript" src="'.$this->yui3loader->local_comboBase
+            //        . implode('&amp;', $baserollups) . '"></script>';
+            foreach ($baserollups as $rollup) {
+                $code .= '<script type="text/javascript" src="'.$this->yui3loader->local_comboBase.$rollup.'"></script>';
+            }
 
         } else {
             if (!empty($page->theme->yuicssmodules)) {
@@ -587,11 +601,11 @@ class MoodleController extends MY_Controller
         if (strpos($url, '/') === 0) {
             if (substr($url, -3) === '.js') {
                 $jsrev = $this->get_jsrev();
-debugBreak();
+
                 if (empty($CFG->slasharguments)) {
-                    return new moodle_url($CFG->httpswwwroot.'/lib/javascript.php', array('rev'=>$jsrev, 'jsfile'=>$url));
+                    return new moodle_url($CFG->httpswwwroot.'/Javascript', array('rev'=>$jsrev, 'jsfile'=>$url)); // /lib/javascript.php
                 } else {
-                    $returnurl = new moodle_url($CFG->httpswwwroot.'/lib/javascript.php');
+                    $returnurl = new moodle_url($CFG->httpswwwroot.'/Javascript');  // /lib/javascript.php
                     $returnurl->set_slashargument('/'.$jsrev.$url);
                     return $returnurl;
                 }
@@ -601,6 +615,127 @@ debugBreak();
         } else {
             throw new coding_exception('Invalid JS url, it has to be shortened url starting with / or moodle_url instance.', $url);
         }
+    }
+
+    /**
+     * This function creates a minimal JS script that requires and calls a single function from an AMD module with arguments.
+     * If it is called multiple times, it will be executed multiple times.
+     *
+     * @param string $fullmodule The format for module names is <component name>/<module name>.
+     * @param string $func The function from the module to call
+     * @param array $params The params to pass to the function. They will be json encoded, so no nasty classes/types please.
+     */
+    protected function js_call_amd($fullmodule, $func, $params = array()) {
+        global $CFG;
+//debugBreak();
+        list($component, $module) = explode('/', $fullmodule, 2);
+
+        $component = clean_param($component, PARAM_COMPONENT);
+        $module = clean_param($module, PARAM_ALPHANUMEXT);
+        $func = clean_param($func, PARAM_ALPHANUMEXT);
+
+        $jsonparams = array();
+        foreach ($params as $param) {
+            $jsonparams[] = json_encode($param);
+        }
+        $strparams = implode(', ', $jsonparams);
+        if ($CFG->debugdeveloper) {
+            $toomanyparamslimit = 1024;
+            if (strlen($strparams) > $toomanyparamslimit) {
+                debugging('Too many params passed to js_call_amd("' . $fullmodule . '", "' . $func . '")', DEBUG_DEVELOPER);
+            }
+        }
+
+        $js = 'require(["' . $component . '/' . $module . '"], function(amd) { amd.' . $func . '(' . $strparams . '); });';
+
+        $this->js_amd_inline($js);
+    }
+
+    public function js_amd_inline($code) {
+        $this->amdjscode[] = $code;
+    }
+
+        /**
+     * Returns js code to load amd module loader, then insert inline script tags
+     * that contain require() calls using RequireJS.
+     * @return string
+     */
+    protected function get_amd_footercode() {
+        global $CFG;
+//debugBreak();
+        $output = '';
+        $jsrev = $this->get_jsrev();
+
+        $jsloader = new moodle_url($CFG->httpswwwroot . '/Javascript');  // /lib/javascript.php
+        $jsloader->set_slashargument('/' . $jsrev . '/');
+        $requirejsloader = new moodle_url($CFG->httpswwwroot . '/Requirejs');  // /lib/requirejs.php
+        $requirejsloader->set_slashargument('/' . $jsrev . '/');
+
+        $requirejsconfig = file_get_contents($CFG->dirroot . '/lib/requirejs/moodle-config.js');
+
+        // No extension required unless slash args is disabled.
+        $jsextension = '.js';
+        if (!empty($CFG->slasharguments)) {
+            $jsextension = '';
+        }
+
+        $requirejsconfig = str_replace('[BASEURL]', $requirejsloader, $requirejsconfig);
+        $requirejsconfig = str_replace('[JSURL]', $jsloader, $requirejsconfig);
+        $requirejsconfig = str_replace('[JSEXT]', $jsextension, $requirejsconfig);
+
+        $output .= html_writer::script($requirejsconfig);
+        if ($CFG->debugdeveloper) {
+            $output .= html_writer::script('', $this->js_fix_url('/lib/requirejs/require.js'));
+        } else {
+            $output .= html_writer::script('', $this->js_fix_url('/lib/requirejs/require.min.js'));
+        }
+
+        // First include must be to a module with no dependencies, this prevents multiple requests.
+        $prefix = "require(['core/first'], function() {\n";
+        $suffix = "\n});";
+        $output .= html_writer::script($prefix . implode(";\n", $this->amdjscode) . $suffix);
+        return $output;
+    }
+
+    protected function get_extra_modules_code() {
+        if (empty($this->extramodules)) {
+            return '';
+        }
+        return html_writer::script(js_writer::function_call('M.yui.add_module', array($this->extramodules)));
+    }
+
+        /**
+     * Get the inline JavaScript code that need to appear in a particular place.
+     * @param bool $ondomready
+     * @return string
+     */
+    protected function get_javascript_code($ondomready) {
+        $where = $ondomready ? 'ondomready' : 'normal';
+        $output = '';
+        if ($this->jscalls[$where]) {
+            foreach ($this->jscalls[$where] as $data) {
+                $output .= js_writer::function_call($data[0], $data[1], $data[2]);
+            }
+            if (!empty($ondomready)) {
+                $output = "    Y.on('domready', function() {\n$output\n});";
+            }
+        }
+        return $output;
+    }
+
+    protected function get_javascript_init_code() {
+        if (count($this->jsinitcode)) {
+            return implode("\n", $this->jsinitcode) . "\n";
+        }
+        return '';
+    }
+
+    protected function get_event_handler_code() {
+        $output = '';
+        foreach ($this->eventhandlers as $h) {
+            $output .= js_writer::event_handler($h['selector'], $h['event'], $h['function'], $h['arguments']);
+        }
+        return $output;
     }
     
 }
