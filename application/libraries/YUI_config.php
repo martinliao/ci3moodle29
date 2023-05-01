@@ -124,9 +124,11 @@ class YUI_config {
         } else {
             $configfn = $cache->get($keyname);
             if ($configfn === false) {
-                require_once($CFG->libdir . '/jslib.php');
-                $configfn = core_minify::js_files(array($fullpath));
-                $cache->set($keyname, $configfn);
+                //require_once($CFG->libdir . '/jslib.php');
+//debugBreak();
+                //$configfn = core_minify::js_files(array($fullpath));
+                $configfn = Minify::js_files(array($fullpath));
+                $cache->save($keyname, $configfn);
             }
         }
         return $this->set_config_function($configfn);
@@ -219,7 +221,7 @@ class YUI_config {
             // Attempt to get the metadata from the cache.
             if (!$metadata = $cache->get('metadata')) {
                 $metadata = $this->get_moodle_metadata();
-                $cache->set('metadata', $metadata);
+                $cache->save('metadata', $metadata);
             }
         }
 

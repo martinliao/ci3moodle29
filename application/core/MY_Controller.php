@@ -20,8 +20,7 @@ class MY_Controller extends MX_Controller
     public $CI;
 
     /**
-     * An array of variables to be passed through to the
-     * view, layout,....
+     * An array of variables to be passed through to the view, layout,....
      */
     protected $data = array();
 
@@ -31,7 +30,7 @@ class MY_Controller extends MX_Controller
 	 * @access public
 	 * @var string
 	 */
-	#public $layout = 'default';
+	public $theme = 'default';
 
     /**
      * [__construct description]
@@ -161,6 +160,15 @@ class MY_Controller extends MX_Controller
 		}
         return $session['sesskey'];
     }
+
+	protected function render_requirejs_page($view, $data)
+    {
+        $_theme = $this->theme; // templates
+        $this->data = array_merge($this->data, $data);
+        $this->load->view("{$_theme}/header", $this->data);
+        $this->load->view($view, $data);
+        $this->load->view("{$_theme}/footer", $this->data);
+    }
 }
 
 // Backend controller
@@ -171,3 +179,5 @@ require_once(APPPATH.'core/Frontend_Controller.php');
 
 // Javascript controller
 require_once(APPPATH.'core/Javascript_Controller.php');
+
+require_once(APPPATH.'core/Moodle_Controller.php');

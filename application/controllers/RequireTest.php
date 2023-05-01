@@ -5,81 +5,34 @@
  *
  */
 
-class RequireTest extends FrontendController
+//class RequireTest extends FrontendController
+class RequireTest extends MoodleController
 {
-	public function standard_head_html()
-	{
-		// standard_head_html:
-		$output = '';
-		// Get the theme javascript head and footer
-		$output = $this->get_head_code();
-		// List alternate versions.
-		return $output;
-	}
 
-	/**
-	 * Site Default Landing Page.
-	 *
-	 * @access public
-	 * @return void
-	 */
 	public function index()
 	{
-		//$output = $this->get_head_code();
-debugBreak();
-		$output = $this->standard_head_html();
+		$standard_head_html = $this->get_head_code();
 
-		$tmp = $this->sesskey();
 		// Load via MY_Controller
 		$this->set_page_title('Your Custom Page Title');
 		$this->set_meta_description('Your Custom Meta Description.');
 		$this->load_css(array(
-			// relative path to your page specific css eg: /css/example.css
+
 			'css/test.css'
 		));
 		$this->load_js(array(
-			// relative path to your page specific javascript eg: /js/example.js
-			// Remember we are going to handle the JS with require.js
 		));
 
 		// Do something here...
 		$foo = 'bar';
-
 		// Assign your data to an array
 		$data = array(
-			'foo' => $foo
+			'foo' => $foo,
+			'standard_head_html' => $standard_head_html
 		);
-
-		// relative path to your views file.php eg: index.php or custom/index.php
-		// pass your data to the view
-		$this->load->view('/general/index', $data);
-	}
-
-	/**
-	 *
-	 * Example of using another layout and view template for your view if needed
-	 *
-	 * @access public
-	 * @return void
-	 *
-	*/
-	public function highlight(){
-		$this->set_page_title('Example of another page');
-		$this->set_meta_description('Example of another page Meta Description.');
-
-		// Set another layout
-		$this->layout = 'highlight';
-
-		// Do something here...
-		// $foo = 'bar';
-
-		// Assign your data to an array
-		$data = array(
-			//'baz' => $foo
-		);
-
-		// Load another view and pass the data
-		$this->load->view('/example/index', $data);
+		//$this->load->view('/general/index', $data);
+		$this->theme = '_requirejs';
+		$this->render_requirejs_page('general/index', $data);
 	}
 
 	function get_head_code() 
@@ -108,8 +61,8 @@ debugBreak();
         $output .= $this->get_css_code();
 		// Link our main JS file, all core stuff should be there.
         //$output .= html_writer::script('', $this->js_fix_url('/lib/javascript-static.js'));
-//debugBreak();
-        $output .= html_writer::script('', '/lib/javascript-static.js'); // ToDo: js_fix_url
+debugBreak();
+		$output .= html_writer::script('', $this->js_fix_url('/lib/javascript-static.js'));
 
 		// Add variables.
         if ($this->jsinitvariables['head']) {
